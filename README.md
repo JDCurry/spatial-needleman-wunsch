@@ -20,6 +20,13 @@ Spatial Needleman-Wunsch solves these problems by:
 - ✅ **Complete interpretability** of every score component
 - ✅ **Chemical intuition preservation** through explicit compatibility matrices
 
+## Try It Live: Spatial Needleman–Wunsch Notebook
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/JDCurry/spatial-needleman-wunsch/HEAD?filepath=Spatial_Needleman_Wunsch_Demo.ipynb)
+[![Notebook](https://img.shields.io/badge/Open%20Notebook-ipynb-blue)](./Spatial_Needleman_Wunsch_Demo.ipynb)
+
+Run the full docking demo in your browser, no setup required.
+
 ## Quick Start
 
 ```bash
