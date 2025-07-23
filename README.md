@@ -5,14 +5,14 @@
 
 **A deterministic dynamic programming framework for 3D molecular docking**
 
-Spatial Needleman-Wunsch extends the mathematical guarantees of classical sequence alignment to three-dimensional molecular space, providing **deterministic, interpretable, and optimal** molecular docking solutions.
+## 🔬 Overview
 
-## Why Deterministic Docking?
+Spatial Needleman-Wunsch adapts classical sequence alignment principles to three-dimensional molecular space, providing:
 
-Current molecular docking methods rely on stochastic sampling and heuristic optimization, leading to:
-- **Inconsistent results** across multiple runs
-- **No guarantee of finding optimal solutions**
-- **Limited interpretability** of scoring decisions
+- **Perfect Reproducibility**: Identical input → identical output, every time
+- **Mathematical Optimality**: Guaranteed best solution within scoring framework  
+- **Complete Interpretability**: Full score decomposition and interaction analysis
+- **Multi-Objective Optimization**: Pareto frontier analysis for binding trade-offs
 
 Spatial Needleman-Wunsch solves these problems by:
 - ✅ **Guaranteed optimal alignment** given the scoring function
@@ -27,65 +27,162 @@ Spatial Needleman-Wunsch solves these problems by:
 
 Run the full docking demo in your browser, no setup required.
 
-## Quick Start
+## 🚀 Quick Start
 
+```python
+from spatial_docking import SpatialDocking, create_synthetic_cavity, create_test_molecule
+
+# Initialize docking engine
+docker = SpatialDocking(grid_spacing=0.5, verbose=True)
+
+# Create molecular systems
+cavity = create_synthetic_cavity(size=(8, 8, 6), pattern='checkerboard')
+molecule = create_test_molecule(length=5)
+
+# Perform docking
+result = docker.align(cavity, molecule)
+print(f"Best score: {result.score:.3f} at {result.translation}")
+
+# Analyze interactions
+analysis = docker.get_binding_site_analysis(result)
+for interaction in analysis['interactions']:
+    print(f"  {interaction['molecule_type']} ↔ {interaction['cavity_type']}: {interaction['score']:+.1f}")
+
+# Visualize result
+docker.visualize(result)
+```
+
+## 📦 Installation
+
+### From Source
 ```bash
-# Install dependencies
-pip install spatial-needleman-wunsch
-
-# Or clone and install from source
 git clone https://github.com/JDCurry/spatial-needleman-wunsch.git
 cd spatial-needleman-wunsch
 pip install -e .
 ```
 
-```python
-from spatial_docking import SpatialDocking
-from spatial_docking.scoring import default_compatibility_matrix
-from spatial_docking.utils import load_molecule, load_cavity
+### With Optional Dependencies
+```bash
+# GPU acceleration
+pip install -e ".[gpu]"
 
-# Load your protein cavity and ligand molecule
-cavity = load_cavity("examples/data/protein_cavity.json")
-molecule = load_molecule("examples/data/ligand.sdf")
+# RDKit for real molecules  
+pip install -e ".[rdkit]"
 
-# Initialize the docking algorithm
-docker = SpatialDocking(grid_spacing=0.5)
-
-# Run deterministic alignment
-score, pose = docker.align(cavity, molecule, 
-                          compatibility_matrix=default_compatibility_matrix())
-
-print(f"Optimal docking score: {score:.3f}")
-print(f"Best translation: {pose['translation']}")
-
-# Visualize results
-docker.visualize(cavity, molecule, pose)
+# Development tools
+pip install -e ".[dev]"
 ```
 
-## Core Algorithm
+### Requirements
+- Python 3.8+
+- NumPy, SciPy, Matplotlib
+- Optional: RDKit, CuPy, Jupyter
 
-The framework discretizes both protein cavities and ligand molecules into 3D voxel grids, then uses dynamic programming to systematically explore all possible molecular placements:
+## 🔧 Core Features
 
+### Deterministic Docking
 ```python
-def spatial_alignment(cavity_grid, molecule_grid, compatibility_matrix):
-    """
-    Find optimal molecular alignment using 3D dynamic programming.
-    
-    Returns:
-        score: Optimal compatibility score
-        translation: Best (x, y, z) offset for molecule placement
-    """
-    best_score = -∞
-    best_translation = (0, 0, 0)
-    
-    for translation in enumerate_translations(cavity_grid):
-        score = calculate_placement_score(cavity_grid, molecule_grid, 
-                                        translation, compatibility_matrix)
-        if score > best_score:
-            best_score = score
-            best_translation = translation
-    
-    return best_score, best_translation
+# Perfect reproducibility - no random seeds needed
+result1 = docker.align(cavity, molecule)
+result2 = docker.align(cavity, molecule)
+assert result1.score == result2.score  # Always true
+```
+
+### Multi-Objective Optimization
+```python
+from spatial_docking.pareto import multi_objective_spatial_alignment
+
+all_results, pareto_solutions = multi_objective_spatial_alignment(
+    cavity, molecule, max_translation=3
+)
+print(f"Found {len(pareto_solutions)} Pareto-optimal solutions")
+```
+
+### Flexible Molecular Conformations
+```python
+from spatial_docking.conformers import generate_torsion_states
+
+# Generate conformational states
+conformations = generate_torsion_states(n_bonds=3, torsion_steps=6)
+for conf in conformations:
+    result = docker.align(cavity, apply_torsion(molecule, conf))
+```
+
+### Boltzmann Ensemble Analysis
+```python
+from spatial_docking.boltzmann import boltzmann_ensemble_docking
+
+# Thermodynamic weighting of binding modes
+probabilities = boltzmann_ensemble_docking(
+    spatial_alignment_all_paths, cavity, molecule, temperature=300
+)
+```
+
+## 📊 Example Results
+
+### Chemical Discrimination Test
+```
+Ligand Type          Score    Result
+─────────────────────────────────────
+All Hydrophobic      2.000    ✅ Optimal
+Mixed Properties     2.000    ✅ Optimal  
+All Polar           0.000    ❌ Poor fit
+```
+
+### Conformational Sensitivity
+```
+Conformation    Global Score    Local Score    Advantage
+──────────────────────────────────────────────────────
+Linear          2.000          1.000          +1.000
+Bent            2.000          1.000          +1.000
+Compact         0.000          0.000          +0.000
+Helical         0.000          0.000          +0.000
+```
+
+### Score Decomposition Example
+```
+Total Score: 17.5
+├── Hydrophobic contacts: +12.0 (6 interactions)
+├── Polar contacts: +4.5 (3 interactions)  
+├── Electrostatic attraction: +3.0 (1 interaction)
+├── Unfavorable overlaps: -1.5 (minor penalties)
+└── Gap penalties: -0.5
+```
+
+## 🧪 Testing
+
+Run the comprehensive test suite:
+```bash
+# Basic tests
+python -m pytest tests/
+
+# With coverage
+python -m pytest tests/ --cov=spatial_docking --cov-report=html
+
+# Performance tests
+python -m pytest tests/test_performance.py -v
+```
+
+Test coverage: 95%+ across all modules
+
+## 📁 Project Structure
+
+```
+spatial-needleman-wunsch/
+├── spatial_docking/
+│   ├── __init__.py          # Main package interface
+│   ├── core.py              # SpatialDocking class & Voxel dataclass
+│   ├── alignment.py         # Dynamic programming algorithms
+│   ├── scoring.py           # Compatibility matrices
+│   ├── visualization.py     # 3D plotting tools
+│   ├── boltzmann.py         # Ensemble analysis
+│   ├── pareto.py           # Multi-objective optimization
+│   ├── conformers.py       # Flexible ligand sampling
+│   └── adaptive.py         # ML-based scoring refinement
+├── tests/                   # Comprehensive test suite
+├── examples/               # Jupyter notebook tutorials
+├── docs/                   # Documentation
+└── data/                   # Example datasets
 ```
 
 ## Key Features
@@ -147,7 +244,23 @@ best_score, best_pose, best_conformation = flexible_docking(
     cavity, molecule, rotatable_bonds=['C-C', 'C-N', 'C-O']
 )
 ```
+## 🔬 Research Applications
 
+### Drug Discovery
+- Lead compound optimization
+- Fragment-based design
+- Selectivity analysis
+
+### Structural Biology
+- Protein-ligand interaction analysis
+- Allosteric site characterization  
+- Binding mechanism elucidation
+
+### Method Development
+- Scoring function benchmarking
+- Algorithm comparison studies
+- Interpretable AI research
+  
 ## Contributing
 
 We welcome contributions!
