@@ -180,9 +180,7 @@ spatial-needleman-wunsch/
 │   ├── conformers.py       # Flexible ligand sampling
 │   └── adaptive.py         # ML-based scoring refinement
 ├── tests/                   # Comprehensive test suite
-├── examples/               # Jupyter notebook tutorials
-├── docs/                   # Documentation
-└── data/                   # Example datasets
+
 ```
 
 ## Key Features
