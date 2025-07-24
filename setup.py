@@ -16,8 +16,6 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/JDCurry/spatial-needleman-wunsch",
     project_urls={
-        "Bug Tracker": "https://github.com/JDCurry/spatial-needleman-wunsch/issues",
-        "Documentation": "https://spatial-needleman-wunsch.readthedocs.io/",
         "Source Code": "https://github.com/JDCurry/spatial-needleman-wunsch",
     },
     classifiers=[
