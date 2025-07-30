@@ -1,0 +1,32 @@
+```yaml
+cff-version: 1.2.0
+title: "Spatial Needleman-Wunsch: Deterministic Molecular Docking"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: "Curry"
+    given-names: "Joshua"
+    email: "jcurry3428@smail.pcd.edu"
+doi: 10.1101/2025.07.24.666489
+date-released: 2025-07-24
+url: "https://github.com/JDCurry/spatial-needleman-wunsch"
+repository-code: "https://github.com/JDCurry/spatial-needleman-wunsch"
+license: MIT
+version: 1.0.0
+keywords:
+  - molecular-docking
+  - computational-biology
+  - dynamic-programming
+  - drug-discovery
+  - structural-biology
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Curry"
+      given-names: "Joshua Daniel"
+  doi: "10.1101/2025.07.24.666489"
+  journal: "bioRxiv"
+  title: "Spatial Needleman-Wunsch: A Deterministic Dynamic Programming Framework for Molecular Docking"
+  year: 2025
+  url: "https://www.biorxiv.org/content/10.1101/2025.07.24.666489v1"
+  note: "Preprint"
